@@ -201,3 +201,15 @@ main { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gut); }
   .s-dock .s-btn { flex: 1; min-height: 48px; font-size: .88rem; padding: 0 .9em; white-space: nowrap; }
   .s-dock .s-btn:first-child { flex: 1.7; }
 }
+
+.s-send__hint { font-size: .82rem; line-height: 1.45; color: var(--c-ink-soft); margin: 10px 0 0; }
+.s-send__hint a { color: var(--c-accent); text-decoration: none; font-weight: 600; }
+.s-compare { position: relative; border-radius: 12px; overflow: hidden; user-select: none; touch-action: none; }
+.s-compare img { display: block; width: 100%; height: auto; pointer-events: none; }
+.s-compare__after { position: absolute; inset: 0; clip-path: inset(0 0 0 var(--pos, 50%)); }
+.s-compare__range { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
+.s-compare__handle { position: absolute; top: 0; bottom: 0; left: var(--pos, 50%); width: 2px; background: var(--c-accent); pointer-events: none; }
+.s-compare__handle::after { content: "◂ ▸"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--c-accent); color: var(--c-accent-ink); font: 700 13px/1 var(--f-display); padding: 8px 10px; border-radius: 999px; white-space: nowrap; }
+.s-compare__tag { position: absolute; top: 12px; font: 700 12px/1 var(--f-display); text-transform: uppercase; letter-spacing: .08em; padding: 6px 10px; border-radius: 4px; background: color-mix(in srgb, var(--c-canvas) 75%, transparent); }
+.s-compare__tag--before { left: 12px; }
+.s-compare__tag--after { right: 12px; }

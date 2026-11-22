@@ -64,44 +64,15 @@
   // неразрывные пробелы: сумма не рвётся переносом
   const rub = (n) => Math.round(n).toLocaleString("ru-RU").replace(/[   ]/g, " ") + " ₽";
 
-  // ---- онлайн-запись
+  // ---- онлайн-запись (без даты и времени: мастер договаривается об осмотре лично)
   const booking = document.querySelector("[data-s-booking]");
   if (booking) {
-    const daysBox = booking.querySelector("[data-s-days]"), timesBox = booking.querySelector("[data-s-times]");
-    const closed = (booking.dataset.closed || "").split(",").filter(Boolean).map(Number);
-    const slots = (booking.dataset.slots || "").split(",").filter(Boolean);
-    const wd = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"], mon = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
-    const today = new Date(); let made = 0;
-    for (let i = 0; made < +booking.dataset.days && i < 21; i++) {
-      const d = new Date(today); d.setDate(today.getDate() + i);
-      if (closed.includes(d.getDay())) continue;
-      const label = i === 0 ? "Сегодня" : i === 1 ? "Завтра" : wd[d.getDay()] + ", " + d.getDate() + " " + mon[d.getMonth()];
-      const full = (i < 2 ? label.toLowerCase() + ", " : "") + wd[d.getDay()] + " " + d.getDate() + " " + mon[d.getMonth()];
-      daysBox.insertAdjacentHTML("beforeend", `<label class="s-chip"><input type="radio" name="day" value="${made}" data-full="${full}"${made === 0 ? " checked" : ""}><span>${label}</span></label>`);
-      made++;
-    }
-    const drawTimes = () => {
-      const first = daysBox.querySelector("input:checked")?.value === "0";
-      const nowH = today.getHours() + today.getMinutes() / 60;
-      timesBox.innerHTML = "";
-      let firstFree = true;
-      slots.forEach((t) => {
-        const [h, m] = t.split(":").map(Number); const past = first && h + m / 60 <= nowH + 1;
-        timesBox.insertAdjacentHTML("beforeend", `<label class="s-chip"${past ? ' aria-disabled="true"' : ""}><input type="radio" name="time" value="${t}"${past ? " disabled" : firstFree ? " checked" : ""}><span>${t}</span></label>`);
-        if (!past) firstFree = false;
-      });
-      if (firstFree) timesBox.insertAdjacentHTML("beforeend", `<p class="s-demo">На сегодня окна закончились – выберите другой день.</p>`);
-    };
     const update = () => {
-      const s = booking.querySelector("input[name=svc]:checked"), d = daysBox.querySelector("input:checked"), t = timesBox.querySelector("input:checked");
+      const s = booking.querySelector("input[name=svc]:checked");
       const price = s && s.dataset.price ? " (" + (s.dataset.from ? "от " : "") + rub(+s.dataset.price) + ")" : "";
-      setMessage(booking.dataset.message.replace("{услуга}", s ? s.dataset.name + price : "").replace("{день}", d ? d.dataset.full : "").replace("{время}", t ? t.value : "время уточню"));
+      setMessage(booking.dataset.message.replace("{услуга}", s ? s.dataset.name + price : ""));
     };
-    daysBox.addEventListener("change", () => { drawTimes(); update(); });
     booking.addEventListener("change", update);
-    drawTimes();
-    // на сегодня окна закончились – сразу выбираем следующий день
-    if (!timesBox.querySelector("input:not([disabled])")) { const next = daysBox.querySelectorAll("input")[1]; if (next) { next.checked = true; drawTimes(); } }
     update();
   }
 
