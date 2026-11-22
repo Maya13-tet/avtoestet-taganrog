@@ -27,7 +27,8 @@
   } else rev.forEach((el) => el.classList.add("is-in"));
 
   // ---- сообщение в мессенджер
-  const brand = (document.querySelector(".s-bar__brand") || {}).textContent || "";
+  const brandEl = document.querySelector(".s-bar__brand");
+  const brand = (brandEl && brandEl.textContent.trim()) || (document.title.split("·")[0].trim()) || "сайта";
   let message = "Здравствуйте! Пишу с сайта «" + brand.trim() + "».";
   const bubble = document.querySelector("[data-s-bubble]");
   const setMessage = (t) => { message = t; if (bubble) bubble.textContent = t; };
@@ -41,12 +42,23 @@
       const n = body.dataset.wa; const url = (isSlot(n) ? "https://wa.me/" : "https://wa.me/" + digits(n)) + "?text=" + encodeURIComponent(message);
       window.open(url, "_blank", "noopener"); return;
     }
-    // Telegram и MAX не принимают готовый текст по ссылке: копируем его и открываем чат
+    // Telegram: t.me не принимает готовый текст для личного чата –
+    // открываем окно «поделиться» с уже вписанным сообщением и дублируем его в буфер
+    if (kind === "telegram") {
+      const tg = body.dataset.tg; const user = isSlot(tg) ? "" : String(tg).replace(/^@|https?:\/\/t\.me\//g, "");
+      try { await navigator.clipboard.writeText(message); } catch (_) {}
+      const note = a.closest("form, .s-contacts")?.parentElement?.querySelector("[data-s-copied]") || document.querySelector("[data-s-copied]");
+      if (note) { note.textContent = "Сообщение уже вписано - выберите чат Детейлинг Автоэстет и нажмите отправить."; note.hidden = false; setTimeout(() => (note.hidden = true), 5000); }
+      if (user) window.open("https://t.me/share/url?url=&text=" + encodeURIComponent(message), "_blank", "noopener");
+      else window.open("https://t.me/", "_blank", "noopener");
+      return;
+    }
+    // MAX не принимает готовый текст по ссылке: копируем его и открываем чат
     try { await navigator.clipboard.writeText(message); } catch (_) {}
     const note = a.closest("form, .s-contacts")?.parentElement?.querySelector("[data-s-copied]") || document.querySelector("[data-s-copied]");
-    if (note) { note.hidden = false; setTimeout(() => (note.hidden = true), 4000); }
-    const tg = body.dataset.tg; const user = isSlot(tg) ? "" : String(tg).replace(/^@|https?:\/\/t\.me\//g, "");
-    window.open("https://t.me/" + user, "_blank", "noopener");
+    if (note) { note.textContent = "Текст скопирован - вставьте его в чат."; note.hidden = false; setTimeout(() => (note.hidden = true), 5000); }
+    const mx = body.dataset.max;
+    window.open(isSlot(mx) ? "https://max.ru/" : "https://max.ru/" + String(mx).replace(/^@|https?:\/\/max\.ru\//g, ""), "_blank", "noopener");
   });
 
   // неразрывные пробелы: сумма не рвётся переносом
