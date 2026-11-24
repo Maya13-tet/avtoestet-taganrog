@@ -112,4 +112,13 @@
     };
     calc.addEventListener("input", update); calc.addEventListener("change", update); update();
   }
+
+  // ---- сравнение «до/после»: ползунок двигает разделитель
+  document.querySelectorAll(".s-compare").forEach((box) => {
+    const range = box.querySelector(".s-compare__range");
+    if (!range) return;
+    const set = () => box.style.setProperty("--pos", range.value + "%");
+    range.addEventListener("input", set);
+    set();
+  });
 })();
